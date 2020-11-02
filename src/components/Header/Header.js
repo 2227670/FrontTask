@@ -8,9 +8,22 @@ import HomeIcon from '@material-ui/icons/Home';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import InfoIcon from '@material-ui/icons/Info';
 
-function Header() {
+const CurrentPage = (pathname) => {
+    switch (pathname) {
+        case '/':
+            return '/home'
+        case '/about':
+            return '/about'
+        case '/favorites':
+            return '/favorites'
+        default:
+            return '/home'
+    }
+}
 
-    const [page, setPage] = React.useState('home');
+function Header() {
+    const [page, setPage] = React.useState(CurrentPage(window.location.pathname));
+
     const handleChange = (event, newPage) => {
         setPage(newPage);
     };
@@ -22,20 +35,20 @@ function Header() {
                     component={Link}
                     to='/'
                     label="Home"
-                    value="home"
+                    value="/home"
                     icon={<HomeIcon/>}
                 />
                 <BottomNavigationAction
                     component={Link}
-                    to='/favourites'
+                    to='/favorites'
                     label="Favorites"
-                    value="favorites"
+                    value="/favorites"
                     icon={<FavoriteIcon/>}/>
                 <BottomNavigationAction
                     component={Link}
                     to='/about'
                     label="About"
-                    value="about"
+                    value="/about"
                     icon={<InfoIcon/>}/>
             </BottomNavigation>
         </Paper>

@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from 'react-redux'
-import {jokesLoaded} from '../../../../actions/actions'
+import {loadJokes} from '../../../../actions/actions'
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -15,20 +15,20 @@ import MenuList from '@material-ui/core/MenuList';
 import {Typography} from "@material-ui/core";
 import LinearProgress from '@material-ui/core/LinearProgress';
 
-const CategoriesList = (props) => {
+function CategoriesList(props) {
 
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
 
     const handleClick = () => {
-        props.jokesLoaded(props.categories[selectedIndex])
+        props.loadJokes(props.categories[selectedIndex])
     };
 
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
-        props.jokesLoaded(props.categories[index])
+        props.loadJokes(props.categories[index])
     };
 
     const handleToggle = () => {
@@ -55,7 +55,11 @@ const CategoriesList = (props) => {
                 <Typography>
                     Choose by category
                 </Typography>
-                <ButtonGroup variant="contained" color="primary" ref={anchorRef} aria-label="split button">
+                <ButtonGroup
+                    variant="contained"
+                    color="primary"
+                    ref={anchorRef}
+                    aria-label="split button">
                     <Button onClick={handleClick}>{props.categories[selectedIndex]}</Button>
                     <Button
                         color="primary"
@@ -69,7 +73,12 @@ const CategoriesList = (props) => {
                         <ArrowDropDownIcon/>
                     </Button>
                 </ButtonGroup>
-                <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                <Popper open={open}
+                        anchorEl={anchorRef.current}
+                        role={undefined}
+                        transition
+                        disablePortal
+                        style={{"zIndex": 4}}>
                     {({TransitionProps, placement}) => (
                         <Grow
                             {...TransitionProps}
@@ -110,7 +119,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-    jokesLoaded
+    loadJokes
 }
 
 

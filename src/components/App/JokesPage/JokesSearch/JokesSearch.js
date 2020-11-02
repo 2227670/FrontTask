@@ -19,12 +19,19 @@ function JokesSearch(props) {
         props.searchJokes(searchValue)
     };
 
+    const handleKeyPress = (event) => {
+        if (event.key === 'Enter') {
+            props.searchJokes(searchValue)
+        }
+    }
+
     return (
         <div>
             <TextField
                 id="standard-basic"
                 label="Search something"
                 onChange={handleChange}
+                onKeyUp={handleKeyPress}
                 InputProps={{
                     endAdornment:
                         <IconButton onClick={handleClick}>

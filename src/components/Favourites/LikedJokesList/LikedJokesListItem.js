@@ -10,6 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CreateIcon from '@material-ui/icons/Create';
 import SaveIcon from '@material-ui/icons/Save';
+import CancelIcon from '@material-ui/icons/Cancel';
 import TextField from '@material-ui/core/TextField';
 
 
@@ -17,14 +18,27 @@ function SavedJokesListItem(props) {
 
     const [editJoke, setEditJoke] = useState(false)
     const [editJokeText, setEditJokeText] = useState(props.joke)
+    const [error, setError] = useState(false)
+    const [errorText, setErrorText] = useState('')
 
     const saveJoke = () => {
-        props.changeJokeText(editJokeText, props.id)
-        setEditJoke(false)
+        if (editJokeText !== '') {
+            props.changeJokeText(editJokeText, props.id)
+            setEditJoke(false)
+            setErrorText('')
+            setError(false)
+        }
     }
 
     const handleChange = (event) => {
         setEditJokeText(event.target.value)
+        if (event.target.value === '') {
+            setError(true)
+            setErrorText('Cannot be empty')
+        } else {
+            setError(false)
+            setErrorText('')
+        }
     }
 
     return (
@@ -37,11 +51,25 @@ function SavedJokesListItem(props) {
                     fullWidth={true}
                     multiline={true}
                     onChange={handleChange}
+                    error={error}
+                    helperText={errorText}
                     InputProps={{
-                        endAdornment:
-                            <IconButton onClick={saveJoke}>
-                                <SaveIcon/>
-                            </IconButton>
+                        endAdornment: (
+                            <div style={{display: "flex"}}>
+                                <IconButton
+                                    edge="start"
+                                    aria-label="delete"
+                                    onClick={() => setEditJoke(false)}>
+                                    <CancelIcon/>
+                                </IconButton>
+                                <IconButton
+                                    edge="end"
+                                    aria-label="delete"
+                                    onClick={saveJoke}>
+                                    <SaveIcon/>
+                                </IconButton>
+                            </div>
+                        )
                     }}/>
                 :
                 <div>
@@ -52,7 +80,7 @@ function SavedJokesListItem(props) {
                     <ListItemSecondaryAction>
                         <IconButton
                             edge="end"
-                            aria-label="delete"
+                            aria-label="save"
                             onClick={() => setEditJoke(true)}>
                             <CreateIcon/>
                         </IconButton>

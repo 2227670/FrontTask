@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from 'react-redux';
-import {addJokeToFavourite, removeJokeFromFavourites} from '../../../../actions/actions';
+import {addJokeToFavourites, removeJokeFromFavourites} from '../../../../actions/actions';
 
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -25,7 +25,7 @@ function JokesListItem(props) {
                         <DeleteIcon/>
                     </IconButton> : <IconButton
                         edge="end" aria-label="add"
-                        onClick={() => props.addJokeToFavourite(props.id)}>
+                        onClick={() => props.addJokeToFavourites(props.id)}>
                         <FavoriteIcon/>
                     </IconButton>}
                 </ListItemSecondaryAction>
@@ -36,7 +36,7 @@ function JokesListItem(props) {
 
 
 const mapDispatchToProps = {
-    addJokeToFavourite,
+    addJokeToFavourites,
     removeJokeFromFavourites
 }
 

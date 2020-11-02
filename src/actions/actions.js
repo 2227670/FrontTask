@@ -2,14 +2,14 @@ import axios from 'axios'
 import store from '../store'
 
 
-const categoriesLoaded = () => {
+const loadCategories = () => {
     return dispatch => {
         dispatch(GetCategoriesStarted())
         axios.get('https://api.chucknorris.io/jokes/categories')
             .then((result) => {
                 dispatch(GetCategoriesSuccess(result.data))
             }).catch(error => {
-            dispatch(GetCategoriesFailure(error.response.data.message))
+            dispatch(GetCategoriesFailure(error.response ? error.response.data.message : 'Network error'))
         })
     }
 }
@@ -26,25 +26,26 @@ const GetCategoriesFailure = error => ({
     payload: error
 })
 
-const jokesLoaded = (category = null) => {
+const loadJokes = (category = null) => {
     return dispatch => {
         dispatch(GetJokesStarted())
         let jokes = [],
+            savedJokes = [...store.getState().savedJokes],
             path = null
         category ? path = '?category=' + category : path = ''
         for (let i = 0; i <= 7; i++) {
             axios.get('https://api.chucknorris.io/jokes/random' + path)
                 .then((result) => {
-                    if (isItNewJoke(jokes, result.data.id)) {
+                    if (isNewJoke(jokes, result.data.id)) {
                         jokes.push({
                             value: result.data.value,
                             id: result.data.id,
-                            liked: false
+                            liked: isNewJoke(savedJokes, result.data.id) ? false : true
                         })
                     }
                     if (i === 7) dispatch(GetJokesEnded(jokes))
                 }).catch(error => {
-                dispatch(GetJokesFailure(error.response.data.message))
+                dispatch(GetJokesFailure(error.response ? error.response.data.message : 'Network error'))
             })
         }
     }
@@ -53,17 +54,18 @@ const jokesLoaded = (category = null) => {
 function searchJokes(query) {
     return dispatch => {
         dispatch(GetJokesStarted())
-        let jokes = []
-        let jokesStorageFull = false
+        let jokes = [],
+            jokesStorageFull = false,
+            savedJokes = [...store.getState().savedJokes]
         axios.get('https://api.chucknorris.io/jokes/search?query=' + query.trim())
             .then((result) => {
                 if (result.data.result.length > 0) {
                     result.data.result.forEach(joke => {
-                        if (!jokesStorageFull && isItNewJoke(jokes, joke.id)) {
+                        if (!jokesStorageFull && isNewJoke(jokes, joke.id)) {
                             jokes.push({
                                 value: joke.value,
                                 id: joke.id,
-                                liked: false
+                                liked: isNewJoke(savedJokes, joke.id) ? false : true
                             })
                             if (jokes.length > 5) {
                                 jokesStorageFull = true
@@ -74,12 +76,12 @@ function searchJokes(query) {
                     if (!jokesStorageFull) dispatch(GetJokesEnded(jokes))
                 } else dispatch(GetJokesEnded(null))
             }).catch(error => {
-            dispatch(GetJokesFailure(error.response.data.message))
+            dispatch(GetJokesFailure(error.response ? error.response.data.message : 'Network error'))
         })
     }
 }
 
-function isItNewJoke(jokes, newJokeId) {
+function isNewJoke(jokes, newJokeId) {
     let newJoke = true;
     jokes.forEach(joke => {
         if (joke.id === newJokeId) {
@@ -101,7 +103,7 @@ const GetJokesFailure = result => ({
     payload: result
 })
 
-const addJokeToFavourite = (changedJokeId) => {
+const addJokeToFavourites = (changedJokeId) => {
     return dispatch => {
         let jokes = [...store.getState().jokes]
         let savedJokes = [...store.getState().savedJokes]
@@ -196,13 +198,11 @@ const changeShowId = status => ({
 })
 
 
-
-
 export {
-    categoriesLoaded,
-    jokesLoaded,
+    loadCategories,
+    loadJokes,
     searchJokes,
-    addJokeToFavourite,
+    addJokeToFavourites,
     removeJokeFromFavourites,
     changeJokeText,
     changeDenseSetting,

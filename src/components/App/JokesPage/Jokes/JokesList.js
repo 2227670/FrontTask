@@ -1,8 +1,10 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {connect} from 'react-redux'
 import JokesListItem from './JokesListItem'
 
+import Box from '@material-ui/core/Box';
 import List from '@material-ui/core/List';
+import TablePagination from '@material-ui/core/TablePagination';
 import {Typography} from "@material-ui/core";
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Icon from "@material-ui/core/Icon";
@@ -10,35 +12,67 @@ import TransferWithinAStationIcon from '@material-ui/icons/TransferWithinAStatio
 import ErrorIcon from '@material-ui/icons/Error';
 
 
-
 function JokesList(props) {
+
+    useEffect(() => {
+        setPage(0)
+        setRowsPerPage(10)
+    }, [props.jokes])
+
+    const [page, setPage] = React.useState(0)
+    const [rowsPerPage, setRowsPerPage] = React.useState(10)
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage)
+    }
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    }
 
     if (props.loading) {
         return (<LinearProgress/>)
     } else if (props.error) {
         return (
-            <div>
+            <Box>
                 <Typography>{props.error}</Typography>
                 <Icon>
                     <ErrorIcon fontSize={"large"}/>
                 </Icon>
-            </div>)
+            </Box>)
     }
 
     return (
-        <List dense={props.dense}>
-            {props.jokes ? props.jokes.map(joke => {
-                    return <JokesListItem key={joke.id} id={joke.id} liked={joke.liked} joke={joke.value}/>
-                }) :
-                <div>
+        <Box>
+            {props.jokes ?
+                <Box>
+                    <List dense={props.dense}>
+                        {props.jokes.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(joke => {
+                            return <JokesListItem
+                                key={joke.id}
+                                id={joke.id}
+                                joke={joke.value}/>
+                        })}
+                    </List>
+                    <TablePagination
+                        component="div"
+                        count={props.jokes.length}
+                        page={page}
+                        onChangePage={handleChangePage}
+                        labelRowsPerPage="Jokes per page"
+                        rowsPerPage={rowsPerPage}
+                        onChangeRowsPerPage={handleChangeRowsPerPage}
+                    />
+                </Box> :
+                <Box>
                     <Typography>Can't find anything</Typography>
                     <Icon>
                         <TransferWithinAStationIcon fontSize={"large"}/>
                     </Icon>
-                </div>}
-        </List>
+                </Box>}
+        </Box>
     )
-
 }
 
 const mapStateToProps = (state) => {

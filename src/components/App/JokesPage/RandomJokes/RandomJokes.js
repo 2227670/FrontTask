@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from 'react-redux'
-import {loadJokes} from "../../../../actions/actions";
+import {loadJokesRandomly} from "../../../../actions/actions";
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -10,7 +10,7 @@ import {Typography} from "@material-ui/core";
 function RandomJokes(props) {
 
     const handleButtonClick = () => {
-        props.loadJokes()
+        props.loadJokesRandomly()
     }
 
     return (
@@ -29,7 +29,7 @@ function RandomJokes(props) {
 }
 
 const mapDispatchToProps = {
-    loadJokes
+    loadJokesRandomly
 }
 
 export default connect(null, mapDispatchToProps)(RandomJokes)

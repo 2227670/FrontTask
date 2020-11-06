@@ -27,32 +27,32 @@ function JokesSettings(props) {
 
     return (
         <Paper className={classes.paperSettings}>
-        <FormGroup row >
-            <FormControlLabel
-                control={
-                    <Checkbox checked={props.dense}
-                              onChange={(event) => props.changeDenseSetting(event.target.checked)}/>
-                }
-                label="Enable dense"
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={props.showId}
-                        onChange={(event) => props.changeShowIdSetting(event.target.checked)}
-                    />
-                }
-                label="Show joke id"
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={props.darkMode}
-                        onChange={(event) => props.changeDarkModeSetting(event.target.checked)}/>
-                }
-                label="Dark mode"
-            />
-        </FormGroup>
+            <FormGroup row>
+                <FormControlLabel
+                    control={
+                        <Checkbox checked={props.dense}
+                                  onChange={(event) => props.changeDenseSetting(event.target.checked)}/>
+                    }
+                    label="Enable dense"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={props.showId}
+                            onChange={(event) => props.changeShowIdSetting(event.target.checked)}
+                        />
+                    }
+                    label="Show joke id"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={props.darkMode}
+                            onChange={(event) => props.changeDarkModeSetting(event.target.checked)}/>
+                    }
+                    label="Dark mode"
+                />
+            </FormGroup>
         </Paper>
     )
 

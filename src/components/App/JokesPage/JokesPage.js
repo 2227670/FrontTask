@@ -4,11 +4,13 @@ import CategoriesList from "./Categories/CategoriesList";
 import JokesSearch from "./JokesSearch/JokesSearch";
 import JokesList from "./Jokes/JokesList";
 import RandomJokes from "./RandomJokes/RandomJokes";
+import JokesSettings from "./JokesSettings/JokesSettings";
 
+import Box from '@material-ui/core/Box';
 import {makeStyles} from "@material-ui/core/styles";
 import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import JokesSettings from "./JokesSettings/JokesSettings";
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -39,7 +41,7 @@ function JokesPage(){
     const classes = useStyles();
 
     return (
-        <div className={classes.root}>
+        <Box className={classes.root}>
             <Grid container spacing={1} alignItems={"center"} alignContent={"center"}>
                 <Grid item xs={12} sm={6} md={4}>
                     <Paper className={classes.paper}>
@@ -67,7 +69,7 @@ function JokesPage(){
                     </Paper>
                 </Grid>
             </Grid>
-        </div>
+        </Box>
     );
 }
 

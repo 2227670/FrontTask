@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {connect} from 'react-redux'
 import {searchJokes} from '../../../../actions/actions'
 
+import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import IconButton from "@material-ui/core/IconButton";
 import SearchIcon from "@material-ui/icons/Search";
@@ -26,7 +27,7 @@ function JokesSearch(props) {
     }
 
     return (
-        <div>
+        <Box>
             <TextField
                 id="standard-basic"
                 label="Search something"
@@ -38,7 +39,7 @@ function JokesSearch(props) {
                             <SearchIcon/>
                         </IconButton>
                 }}/>
-        </div>
+        </Box>
     );
 }
 

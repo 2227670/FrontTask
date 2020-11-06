@@ -1,6 +1,19 @@
 import axios from 'axios'
 import store from '../store'
 
+export const CATEGORIES_LOADING_STARTED = "CATEGORIES_LOADING_STARTED";
+export const CATEGORIES_LOADING_ENDED = 'CATEGORIES_LOADING_ENDED';
+export const CATEGORIES_LOADING_ERROR = 'CATEGORIES_LOADING_ERROR';
+export const JOKES_LOADING_STARTED = 'JOKES_LOADING_STARTED';
+export const JOKES_LOADING_ENDED = 'JOKES_LOADING_ENDED';
+export const JOKES_LOADING_ERROR = 'JOKES_LOADING_ERROR';
+export const ADD_JOKE = 'ADD_JOKE';
+export const REMOVE_JOKE = 'REMOVE_JOKE';
+export const JOKE_CHANGED = 'JOKE_CHANGED';
+export const DENSE_CHANGED = 'DENSE_CHANGED';
+export const DARK_MODE_CHANGED = 'DARK_MODE_CHANGED';
+export const SHOW_ID_CHANGED = 'SHOW_ID_CHANGED';
+
 
 const loadCategories = () => {
     return dispatch => {
@@ -15,32 +28,56 @@ const loadCategories = () => {
 }
 
 const GetCategoriesStarted = () => ({
-    type: 'CATEGORIES_LOADING_STARTED'
+    type: CATEGORIES_LOADING_STARTED
 })
 const GetCategoriesSuccess = result => ({
-    type: 'CATEGORIES_LOADING_ENDED',
+    type: CATEGORIES_LOADING_ENDED,
     payload: result
 })
 const GetCategoriesFailure = error => ({
-    type: 'CATEGORIES_LOADING_ERROR',
+    type: CATEGORIES_LOADING_ERROR,
     payload: error
 })
 
-const loadJokes = (category = null) => {
+const loadJokesByCategory = (category) => {
     return dispatch => {
         dispatch(GetJokesStarted())
         let jokes = [],
-            savedJokes = [...store.getState().savedJokes],
-            path = null
-        category ? path = '?category=' + category : path = ''
-        for (let i = 0; i <= 7; i++) {
-            axios.get('https://api.chucknorris.io/jokes/random' + path)
+            queryFailed = 0;
+        (function fetchApi() {
+            axios.get('https://api.chucknorris.io/jokes/random?category=' + category)
                 .then((result) => {
                     if (isNewJoke(jokes, result.data.id)) {
                         jokes.push({
                             value: result.data.value,
-                            id: result.data.id,
-                            liked: isNewJoke(savedJokes, result.data.id) ? false : true
+                            id: result.data.id
+                        })
+                    } else {
+                        ++queryFailed
+                    }
+                    if (queryFailed >= 6) {
+                        dispatch(GetJokesEnded(jokes))
+                    } else {
+                        fetchApi()
+                    }
+                }).catch(error => {
+                dispatch(GetJokesFailure(error.response ? error.response.data.message : 'Network error'))
+            })
+        }());
+    }
+}
+
+function loadJokesRandomly() {
+    return dispatch => {
+        dispatch(GetJokesStarted())
+        let jokes = []
+        for (let i = 0; i <= 7; i++) {
+            axios.get('https://api.chucknorris.io/jokes/random')
+                .then((result) => {
+                    if (isNewJoke(jokes, result.data.id)) {
+                        jokes.push({
+                            value: result.data.value,
+                            id: result.data.id
                         })
                     }
                     if (i === 7) dispatch(GetJokesEnded(jokes))
@@ -54,26 +91,19 @@ const loadJokes = (category = null) => {
 function searchJokes(query) {
     return dispatch => {
         dispatch(GetJokesStarted())
-        let jokes = [],
-            jokesStorageFull = false,
-            savedJokes = [...store.getState().savedJokes]
+        let jokes = []
         axios.get('https://api.chucknorris.io/jokes/search?query=' + query.trim())
             .then((result) => {
                 if (result.data.result.length > 0) {
                     result.data.result.forEach(joke => {
-                        if (!jokesStorageFull && isNewJoke(jokes, joke.id)) {
+                        if (isNewJoke(jokes, joke.id)) {
                             jokes.push({
                                 value: joke.value,
-                                id: joke.id,
-                                liked: isNewJoke(savedJokes, joke.id) ? false : true
+                                id: joke.id
                             })
-                            if (jokes.length > 5) {
-                                jokesStorageFull = true
-                                dispatch(GetJokesEnded(jokes))
-                            }
                         }
                     })
-                    if (!jokesStorageFull) dispatch(GetJokesEnded(jokes))
+                    dispatch(GetJokesEnded(jokes))
                 } else dispatch(GetJokesEnded(null))
             }).catch(error => {
             dispatch(GetJokesFailure(error.response ? error.response.data.message : 'Network error'))
@@ -92,59 +122,37 @@ function isNewJoke(jokes, newJokeId) {
 }
 
 const GetJokesStarted = () => ({
-    type: 'JOKES_LOADING_STARTED',
+    type: JOKES_LOADING_STARTED,
 })
 const GetJokesEnded = result => ({
-    type: 'JOKES_LOADING_ENDED',
+    type: JOKES_LOADING_ENDED,
     payload: result
 })
 const GetJokesFailure = result => ({
-    type: 'JOKES_LOADING_ERROR',
+    type: JOKES_LOADING_ERROR,
     payload: result
 })
 
-const addJokeToFavourites = (changedJokeId) => {
+const addJokeToFavourites = newJoke => {
     return dispatch => {
-        let jokes = [...store.getState().jokes]
-        let savedJokes = [...store.getState().savedJokes]
-        jokes.forEach(joke => {
-            if (joke.id === changedJokeId) {
-                joke.liked = !joke.liked
-                savedJokes.push({
-                    value: joke.value,
-                    id: joke.id
-                })
-            }
-        })
-        dispatch(MoveJokeToFavourites({jokes, savedJokes}))
+        dispatch(MoveJokeToFavourites(newJoke))
     }
 }
 
-const MoveJokeToFavourites = jokes => ({
-    type: 'JOKE_LIKED',
-    payload: jokes
+const MoveJokeToFavourites = newJoke => ({
+    type: ADD_JOKE,
+    payload: newJoke
 })
 
 const removeJokeFromFavourites = (changedJokeId) => {
     return dispatch => {
-        let jokes = [...store.getState().jokes]
-        let savedJokes = [...store.getState().savedJokes]
-        jokes.forEach(joke => {
-            if (joke.id === changedJokeId) {
-                joke.liked = !joke.liked
-            }
-        })
-        let removeJoke = savedJokes.map(function (joke) {
-            return joke.id
-        }).indexOf(changedJokeId)
-        savedJokes.splice(removeJoke, 1)
-        dispatch(RemoveJokeFromFavourites({jokes, savedJokes}))
+        dispatch(RemoveJokeFromFavourites(changedJokeId))
     }
 }
 
-const RemoveJokeFromFavourites = jokes => ({
-    type: 'JOKE_LIKED',
-    payload: jokes
+const RemoveJokeFromFavourites = jokeId => ({
+    type: REMOVE_JOKE,
+    payload: jokeId
 })
 
 const changeJokeText = (savedJoke, savedJokeId) => {
@@ -160,7 +168,7 @@ const changeJokeText = (savedJoke, savedJokeId) => {
 }
 
 const ChangeJokeValue = savedJokes => ({
-    type: 'JOKE_CHANGED',
+    type: JOKE_CHANGED,
     payload: savedJokes
 })
 
@@ -171,7 +179,7 @@ const changeDenseSetting = (dense) => {
 }
 
 const ChangeDense = status => ({
-    type: 'DENSE_CHANGED',
+    type: DENSE_CHANGED,
     payload: status
 })
 
@@ -182,7 +190,7 @@ const changeDarkModeSetting = (darkMode) => {
 }
 
 const ChangeDarkMode = status => ({
-    type: 'DARK_MODE_CHANGED',
+    type: DARK_MODE_CHANGED,
     payload: status
 })
 
@@ -193,14 +201,15 @@ const changeShowIdSetting = (showId) => {
 }
 
 const changeShowId = status => ({
-    type: 'SHOW_ID_CHANGED',
+    type: SHOW_ID_CHANGED,
     payload: status
 })
 
 
 export {
     loadCategories,
-    loadJokes,
+    loadJokesRandomly,
+    loadJokesByCategory,
     searchJokes,
     addJokeToFavourites,
     removeJokeFromFavourites,

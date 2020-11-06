@@ -1,6 +1,6 @@
 import React from "react";
 import {connect} from 'react-redux'
-import {loadJokes} from '../../../../actions/actions'
+import {loadJokesByCategory} from '../../../../actions/actions'
 
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
@@ -22,13 +22,13 @@ function CategoriesList(props) {
     const [selectedIndex, setSelectedIndex] = React.useState(1);
 
     const handleClick = () => {
-        props.loadJokes(props.categories[selectedIndex])
+        props.loadJokesByCategory(props.categories[selectedIndex])
     };
 
     const handleMenuItemClick = (event, index) => {
         setSelectedIndex(index);
         setOpen(false);
-        props.loadJokes(props.categories[index])
+        props.loadJokesByCategory(props.categories[index])
     };
 
     const handleToggle = () => {
@@ -119,7 +119,7 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = {
-    loadJokes
+    loadJokesByCategory
 }
 
 

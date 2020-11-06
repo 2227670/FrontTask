@@ -3,6 +3,7 @@ import {connect} from 'react-redux';
 import {removeJokeFromFavourites} from '../../../actions/actions';
 import {changeJokeText} from '../../../actions/actions';
 
+import Box from '@material-ui/core/Box';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -16,10 +17,12 @@ import TextField from '@material-ui/core/TextField';
 
 function SavedJokesListItem(props) {
 
-    const [editJoke, setEditJoke] = useState(false)
-    const [editJokeText, setEditJokeText] = useState(props.joke)
-    const [error, setError] = useState(false)
-    const [errorText, setErrorText] = useState('')
+    const [editJoke, setEditJoke] = useState(false),
+        [editJokeText, setEditJokeText] = useState(props.joke),
+        [error, setError] = useState(false),
+        [errorText, setErrorText] = useState(''),
+        [saveBtnStatus, setSaveBtnStatus] = useState(false)
+
 
     const saveJoke = () => {
         if (editJokeText !== '') {
@@ -30,10 +33,16 @@ function SavedJokesListItem(props) {
         }
     }
 
+    const cancelJokeEditing = () => {
+        setEditJoke(false)
+        setEditJokeText(props.joke)
+    }
+
     const handleChange = (event) => {
         setEditJokeText(event.target.value)
         if (event.target.value === '') {
             setError(true)
+            setSaveBtnStatus(true)
             setErrorText('Cannot be empty')
         } else {
             setError(false)
@@ -42,7 +51,7 @@ function SavedJokesListItem(props) {
     }
 
     return (
-        <div>
+        <Box>
             <ListItem>{editJoke ?
                 <TextField
                     id="outlined-basic"
@@ -55,24 +64,25 @@ function SavedJokesListItem(props) {
                     helperText={errorText}
                     InputProps={{
                         endAdornment: (
-                            <div style={{display: "flex"}}>
+                            <Box style={{display: "flex"}}>
                                 <IconButton
                                     edge="start"
                                     aria-label="delete"
-                                    onClick={() => setEditJoke(false)}>
+                                    onClick={cancelJokeEditing}>
                                     <CancelIcon/>
                                 </IconButton>
                                 <IconButton
                                     edge="end"
+                                    disabled={saveBtnStatus}
                                     aria-label="delete"
                                     onClick={saveJoke}>
                                     <SaveIcon/>
                                 </IconButton>
-                            </div>
+                            </Box>
                         )
                     }}/>
                 :
-                <div>
+                <Box>
                     <ListItemText
                         primary={props.joke}
                         secondary={props.showId ? props.id : null}
@@ -91,10 +101,10 @@ function SavedJokesListItem(props) {
                             <DeleteIcon/>
                         </IconButton>
                     </ListItemSecondaryAction>
-                </div>
+                </Box>
             }
             </ListItem>
-        </div>
+        </Box>
     )
 }
 

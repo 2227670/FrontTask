@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import {BrowserRouter as Router, Switch, Route, Redirect} from "react-router-dom";
 
 import {connect} from "react-redux"
-import {loadJokes, loadCategories} from '../../actions/actions';
+import {loadJokesRandomly, loadCategories} from '../../actions/actions';
 
 import Header from "../Header/Header";
 import About from "../About/About";
@@ -16,8 +16,8 @@ import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 function App(props) {
 
     useEffect(() => {
-        props.categoriesLoaded()
-        props.loadJokes()
+        props.loadCategories()
+        props.loadJokesRandomly()
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
@@ -64,8 +64,8 @@ function App(props) {
 }
 
 const mapDispatchToProps = {
-    categoriesLoaded: loadCategories,
-    loadJokes
+    loadCategories,
+    loadJokesRandomly
 }
 
 const mapStateToProps = (state) => {
